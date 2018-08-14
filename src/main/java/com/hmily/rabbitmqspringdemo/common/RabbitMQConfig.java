@@ -24,7 +24,7 @@ public class RabbitMQConfig {
     @Bean
     public ConnectionFactory connectionFactory(){
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
-        connectionFactory.setAddresses(RABBITMQ_HOST);
+        connectionFactory.setAddresses(RABBITMQ_HOST + ":" + RABBITMQ_PORT);
         connectionFactory.setUsername(RABBITMQ_USERNAME);
         connectionFactory.setPassword(RABBITMQ_PASSWORD);
         connectionFactory.setVirtualHost(RABBITMQ_DEFAULT_VIRTUAL_HOST);
