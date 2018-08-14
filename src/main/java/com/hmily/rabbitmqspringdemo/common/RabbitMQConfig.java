@@ -1,19 +1,23 @@
 package com.hmily.rabbitmqspringdemo.common;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import com.rabbitmq.client.Channel;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.support.ConsumerTagStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.UUID;
+@Slf4j
 @Configuration
-@ComponentScan({"com.hmily.rabbitmqspringdemo.common.*"})
+@ComponentScan({"com.hmily.rabbitmqspringdemo.*"})
 public class RabbitMQConfig {
 
     public final static String RABBITMQ_HOST = "192.168.0.7";
@@ -23,7 +27,7 @@ public class RabbitMQConfig {
     public final static String RABBITMQ_PASSWORD = "guest";
 
     @Bean
-    public ConnectionFactory connectionFactory(){
+    public ConnectionFactory connectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
         connectionFactory.setAddresses(RABBITMQ_HOST + ":" + RABBITMQ_PORT);
         connectionFactory.setUsername(RABBITMQ_USERNAME);
@@ -43,10 +47,10 @@ public class RabbitMQConfig {
      * 针对消费者配置
      * 1. 设置交换机类型
      * 2. 将队列绑定到交换机
-     FanoutExchange: 将消息分发到所有的绑定队列，无routingkey的概念
-     HeadersExchange ：通过添加属性key-value匹配
-     DirectExchange:按照routingkey分发到指定队列
-     TopicExchange:多关键字匹配
+     * FanoutExchange: 将消息分发到所有的绑定队列，无routingkey的概念
+     * HeadersExchange ：通过添加属性key-value匹配
+     * DirectExchange:按照routingkey分发到指定队列
+     * TopicExchange:多关键字匹配
      */
     @Bean
     public TopicExchange exchange001() {
@@ -99,10 +103,38 @@ public class RabbitMQConfig {
     }
 
 
-    @Bean
+    @Bean //connectionFactory 也是要和最上面保持一致
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         return rabbitTemplate;
+    }
+
+    @Bean   //connectionFactory 也是要和最上面保持一致
+    public SimpleMessageListenerContainer messageContainer(ConnectionFactory connectionFactory) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory);
+        container.setQueues(queue001(), queue002(), queue003(), queue_image(), queue_pdf());    //监听的队列
+        container.setConcurrentConsumers(1);    //当前的消费者数量
+        container.setMaxConcurrentConsumers(5); //  最大的消费者数量
+        container.setDefaultRequeueRejected(false); //是否重回队列
+        container.setAcknowledgeMode(AcknowledgeMode.AUTO); //签收模式
+        container.setExposeListenerChannel(true);
+        container.setConsumerTagStrategy(new ConsumerTagStrategy() {    //消费端的标签策略
+            @Override
+            public String createConsumerTag(String queue) {
+                return queue + "_" + UUID.randomUUID().toString();
+            }
+        });
+        container.setMessageListener(new ChannelAwareMessageListener() {
+            @Override
+            public void onMessage(Message message, Channel channel) throws Exception {
+                String msg = new String(message.getBody());
+                log.info("----------消费者: " + msg);
+            }
+        });
+
+
+        return container;
+
     }
 
 }
