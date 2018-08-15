@@ -124,14 +124,28 @@ public class RabbitMQConfig {
                 return queue + "_" + UUID.randomUUID().toString();
             }
         });
-        container.setMessageListener(new ChannelAwareMessageListener() {
+        
+     /*   container.setMessageListener(new ChannelAwareMessageListener() {
             @Override
             public void onMessage(Message message, Channel channel) throws Exception {
                 String msg = new String(message.getBody());
                 log.info("----------消费者: " + msg);
             }
         });
-
+*/
+        //1.1 适配器方式. 默认是有自己的方法名字的：handleMessage
+       /* MessageListenerAdapter adapter = new MessageListenerAdapter(new MessageDelegate());
+    	container.setMessageListener(adapter);*/
+        //1.2 适配器方式. 可以自己指定一个方法的名字: consumeMessage
+      /*  MessageListenerAdapter adapter = new MessageListenerAdapter(new MessageDelegate());
+    	adapter.setDefaultListenerMethod("consumeMessage");
+    	container.setMessageListener(adapter);*/
+        
+        //1.3 适配器方式.也可以添加一个转换器: 从字节数组转换为String
+    	MessageListenerAdapter adapter = new MessageListenerAdapter(new MessageDelegate());
+    	adapter.setDefaultListenerMethod("consumeMessage");
+    	adapter.setMessageConverter(new TextMessageConverter());
+    	container.setMessageListener(adapter);
 
         return container;
 
