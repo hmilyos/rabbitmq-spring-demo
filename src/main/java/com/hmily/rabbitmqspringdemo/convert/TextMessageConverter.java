@@ -1,9 +1,10 @@
 package com.hmily.rabbitmqspringdemo.convert;
 
-import com.bfxy.spring.convert.Message;
-import com.bfxy.spring.convert.MessageConversionException;
-import com.bfxy.spring.convert.MessageConverter;
-import com.bfxy.spring.convert.MessageProperties;
+
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.support.converter.MessageConversionException;
+import org.springframework.amqp.support.converter.MessageConverter;
 
 public class TextMessageConverter implements MessageConverter {
 	

@@ -1,53 +1,58 @@
 package com.hmily.rabbitmqspringdemo.adapter;
 
+import com.hmily.rabbitmqspringdemo.domain.Order;
+import com.hmily.rabbitmqspringdemo.domain.Packaged;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.File;
 import java.util.Map;
 
-import com.bfxy.spring.entity.Order;
-import com.bfxy.spring.entity.Packaged;
 
+@Slf4j
 public class MessageDelegate {
-	
+	//这个handleMessage方法名要根据org.springframework.amqp.rabbit.listener.adapter包下的
+    //      MessageListenerAdapter.ORIGINAL_DEFAULT_LISTENER_METHOD的默认值来确定
 	public void handleMessage(byte[] messageBody) {
-		System.err.println("默认方法, 消息内容:" + new String(messageBody));
+		log.info("默认方法, 消息内容:" + new String(messageBody));
 	}
 	
 	public void consumeMessage(byte[] messageBody) {
-		System.err.println("字节数组方法, 消息内容:" + new String(messageBody));
+		log.info("字节数组方法, 消息内容:" + new String(messageBody));
 	}
-	
+
+
 	public void consumeMessage(String messageBody) {
-		System.err.println("字符串方法, 消息内容:" + messageBody);
+		log.info("字符串方法, 消息内容:" + messageBody);
 	}
-	
+
 	public void method1(String messageBody) {
-		System.err.println("method1 收到消息内容:" + new String(messageBody));
+		log.info("method1 收到消息内容:" + new String(messageBody));
 	}
 	
 	public void method2(String messageBody) {
-		System.err.println("method2 收到消息内容:" + new String(messageBody));
+		log.info("method2 收到消息内容:" + new String(messageBody));
 	}
 	
-	
+	/*
 	public void consumeMessage(Map messageBody) {
-		System.err.println("map方法, 消息内容:" + messageBody);
+		log.info("map方法, 消息内容:" + messageBody);
 	}
 	
 	
 	public void consumeMessage(Order order) {
-		System.err.println("order对象, 消息内容, id: " + order.getId() + 
+		log.info("order对象, 消息内容, id: " + order.getId() + 
 				", name: " + order.getName() + 
 				", content: "+ order.getContent());
 	}
 	
 	public void consumeMessage(Packaged pack) {
-		System.err.println("package对象, 消息内容, id: " + pack.getId() + 
+		log.info("package对象, 消息内容, id: " + pack.getId() + 
 				", name: " + pack.getName() + 
 				", content: "+ pack.getDescription());
 	}
 	
 	public void consumeMessage(File file) {
-		System.err.println("文件对象 方法, 消息内容:" + file.getName());
-	}
+		log.info("文件对象 方法, 消息内容:" + file.getName());
+	}*/
 
 }
