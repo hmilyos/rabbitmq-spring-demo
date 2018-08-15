@@ -142,10 +142,36 @@ public class RabbitMQConfig {
     	container.setMessageListener(adapter);*/
         
         //1.3 适配器方式.也可以添加一个转换器: 从字节数组转换为String
-    	MessageListenerAdapter adapter = new MessageListenerAdapter(new MessageDelegate());
-    	adapter.setDefaultListenerMethod("consumeMessage");
-    	adapter.setMessageConverter(new TextMessageConverter());
-    	container.setMessageListener(adapter);
+//    	MessageListenerAdapter adapter = new MessageListenerAdapter(new MessageDelegate());
+//    	adapter.setDefaultListenerMethod("consumeMessage");
+//    	adapter.setMessageConverter(new TextMessageConverter());
+//    	container.setMessageListener(adapter);
+    	
+//        2 适配器方式: 我们的队列名称 和 方法名称 也可以进行一一的匹配
+//        MessageListenerAdapter adapter = new MessageListenerAdapter(new MessageDelegate());
+//    	adapter.setMessageConverter(new TextMessageConverter());
+//    	Map<String, String> queueOrTagToMethodName = new HashMap<>();
+//    	queueOrTagToMethodName.put("queue001", "method1");
+//    	queueOrTagToMethodName.put("queue002", "method2");
+//    	adapter.setQueueOrTagToMethodName(queueOrTagToMethodName);
+//    	container.setMessageListener(adapter);    
+        
+        //3  支持json格式的转换器
+        MessageListenerAdapter adapter = new MessageListenerAdapter(new MessageDelegate());
+        adapter.setDefaultListenerMethod("consumeMessage");
+        Jackson2JsonMessageConverter jackson2JsonMessageConverter = new Jackson2JsonMessageConverter();
+        adapter.setMessageConverter(jackson2JsonMessageConverter);
+        container.setMessageListener(adapter);
+        
+        // 4  DefaultJackson2JavaTypeMapper & Jackson2JsonMessageConverter 支持java对象转换
+        MessageListenerAdapter adapter = new MessageListenerAdapter(new MessageDelegate());
+        adapter.setDefaultListenerMethod("consumeMessage");
+        Jackson2JsonMessageConverter jackson2JsonMessageConverter = new Jackson2JsonMessageConverter();
+        DefaultJackson2JavaTypeMapper javaTypeMapper = new DefaultJackson2JavaTypeMapper();
+        jackson2JsonMessageConverter.setJavaTypeMapper(javaTypeMapper);
+        adapter.setMessageConverter(jackson2JsonMessageConverter);
+        container.setMessageListener(adapter);
+    	
 
         return container;
 
