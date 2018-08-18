@@ -1,44 +1,18 @@
 package com.hmily.rabbitmqspringdemo.domain;
 
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Order {
-	
-private String id;
-	
-	private String name;
-	
-	private String content;
 
-	public Order() {
-	}
-	
-	public Order(String id, String name, String content) {
-		this.id = id;
-		this.name = name;
-		this.content = content;
-	}
+    private String id;
 
-	public String getId() {
-		return id;
-	}
+    private String name;
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    private String content;
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
 
 }
